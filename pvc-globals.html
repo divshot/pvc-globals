@@ -146,38 +146,33 @@ them using the standard Polymer observe:
         }
 
                 /**
-         * The `pvc-globals-change` event is fired on the `document` whenever a
+         * The `pvc-globals-change` event is fired on each element whenever a
          * global variable is added. The detail is an object including the 
-         * `namespace`, `property`, `value`, and `oldValue`. It is also fired in a
-         * non-propagating manner on any element matching the same namespace.
+         * `namespace`, `property`, `value`, and `oldValue`.
          * 
          * @event pvc-globals-add
          */
          
         /**
-         * The `pvc-globals-change` event is fired on the `document` whenever a
+         * The `pvc-globals-change` event is fired on each element whenever a
          * global variable is removed. The detail is an object including the 
-         * `namespace`, `property`, `value`, and `oldValue`. It is also fired in a
-         * non-propagating manner on any element matching the same namespace.
+         * `namespace`, `property`, `value`, and `oldValue`.
          * 
          * @event pvc-globals-remove
          */
         
         /**
-         * The `pvc-globals-change` event is fired on the `document` whenever a
+         * The `pvc-globals-change` event is fired on each element whenever a
          * global variable is modified. The detail is an object including the 
-         * `namespace`, `property`, `value`, `oldValue`. It is also fired in a
-         * non-propagating manner on any element matching the same namespace.
+         * `namespace`, `property`, `value`, `oldValue`.
          * 
          * @event pvc-globals-change
          */
         
         /**
-         * The `pvc-globals-update` event is fired on the `document` whenever any
+         * The `pvc-globals-update` event is fired on each element whenever any
          * kind of alteration (add, remove, change) is made. The detail is an
-         * object including the `namespace`, `property`, `value`, `oldValue`. 
-         * It is also fired in a non-propagating manner on any element matching
-         * the same namespace.
+         * object including the `namespace`, `property`, `value`, `oldValue`.
          * 
          * @event pvc-globals-change
          */
