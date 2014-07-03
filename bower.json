@@ -1,14 +1,14 @@
 {
-  "name": "seed-element",
+  "name": "pvc-globals",
   "version": "0.0.0",
   "authors": [
-    "Anonymous <anonymous@example.com>"
+    "Michael Bleigh <mbleigh@mbleigh.com>"
   ],
   "description": "Element providing solution to no problem in particular.",
-  "keywords": "seed, polymer, web-components",
-  "main": "seed-element.html",
+  "keywords": "polymer, web-components, pvc",
+  "main": "pvc-globals.html",
   "license": "MIT",
-  "homepage": "https://github.com/<USERNAME>/seed-element/",
+  "homepage": "https://github.com/divshot/pvc-globals",
   "ignore": [
     "**/.*"
   ],

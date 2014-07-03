@@ -7,6 +7,37 @@ Document-wide globals with instant cross-element propagation.
 
     <pvc-globals namespace="org" values="{{globals}}"></pvc-globals>
 
+Globals are shared across all instances of the `pvc-globals` element, so
+changing a value in one will be reflected in every other element with the
+same namespace.
+
+You can bind to the values directly, but you can also listen for events.
+Each element will trigger a `pvc-globals-*` event with `*` being one of
+`add`, `remove`, `change`, or `update`. The `update` event fires when
+any of the other events happens and includes an `event` key in its detail
+to tell you which.
+
+    <pvc-globals on-pvc-globals-update="{{handleUpdate}}"></pvc-globals>
+
+If you need to observe deeply nested global properties, you can register
+them using the standard Polymer observe:
+
+    <polymer-element name="globals-watcher">
+      <template>
+        <pvc-globals id='globals'></pvc-globals>
+      </template>
+      <script>
+        Polymer('globals-watcher', {
+          observe: {
+            '$.globals.values.deep.key.to.watch': 'deepChange'
+          },
+          deepChange: function(){
+            // ...
+          }
+        });
+      </script>
+    </polymer-element>
+
 @element pvc-globals
 @blurb Document-wide globals with instant cross-element propagation.
 @status alpha
@@ -15,15 +46,20 @@ Document-wide globals with instant cross-element propagation.
 <polymer-element name="pvc-globals" attributes="namespace values">
   <script>
     (function() {
-      var _globals = {}
-      var _observers = {}
+      var _globals = {};
+      var _observers = {};
+      var _instances = [];
       
       var _fire = function(name, detail) {
-        document.dispatchEvent(new CustomEvent(name, {detail: detail}));
+        _instances.forEach(function(instance) {
+          if (instance.namespace === detail.namespace) {
+            instance.fire(name, detail);
+          }
+        });
       }
                                
       var _observeFn = function(namespace, added, removed, changed, getOldValueFn) {
-        console.log('_observeFn');
+        if (namespace === '__default'){ namespace = null; }
         Object.keys(added).forEach(function(prop) {
           var detail =  {
             event: 'add',
@@ -93,16 +129,8 @@ Document-wide globals with instant cross-element propagation.
          * @type object
          */
         created: function() {
+          _instances.push(this);
           this.resetData();
-          document.addEventListener('pvc-globals-update', this.eventRepeater.bind(this));
-          document.addEventListener('pvc-globals-add', this.eventRepeater.bind(this));
-          document.addEventListener('pvc-globals-remove', this.eventRepeater.bind(this));
-          document.addEventListener('pvc-globals-change', this.eventRepeater.bind(this));
-        },
-        
-        eventRepeater: function(e) {
-          // e.stopPropagation();
-          this.fire(e);
         },
 
         get _ns() {
