@@ -43,7 +43,7 @@ them using the standard Polymer observe:
 @status alpha
 @homepage http://code.divshot.com/pvc-globals
 -->
-<polymer-element name="pvc-globals" attributes="namespace values">
+<polymer-element name="pvc-globals" attributes="namespace">
   <script>
     (function() {
       var _globals = {};
@@ -97,17 +97,19 @@ them using the standard Polymer observe:
         });
       }
       
-      var _makeObserver = function(namespace) {
-        _globals[namespace] = _globals[namespace] || {}
+      var _makeAndObserve = function(namespace) {
+        _globals[namespace] || (_globals[namespace] = {});
         _observers[namespace] = new ObjectObserver(_globals[namespace]);
         _observers[namespace].open(function(a,r,c,o) {
           _observeFn(namespace,a,r,c,o);
         });
+        return _globals[namespace];
       };
       
-      _makeObserver('__default');
-      
       Polymer('pvc-globals', {
+        publish: {
+          values: null
+        },
         observe: {
           namespace: 'resetData'
         },
@@ -137,15 +139,22 @@ them using the standard Polymer observe:
           return this.namespace || '__default';
         },
         
+        get values() {
+          this.resetData();
+          return _globals[this._ns];
+        },
+        
+        set values(data) {
+          throw "Globals objects are immutable. You can only work on subkeys.";
+        },
+        
         resetData: function() {
           if (!_globals[this._ns]) {
-            _makeObserver(this._ns);
+            _makeAndObserve(this._ns);
           }
-          
-          this.values = _globals[this._ns];
         }
 
-                /**
+        /**
          * The `pvc-globals-change` event is fired on each element whenever a
          * global variable is added. The detail is an object including the 
          * `namespace`, `property`, `value`, and `oldValue`.
@@ -174,7 +183,7 @@ them using the standard Polymer observe:
          * kind of alteration (add, remove, change) is made. The detail is an
          * object including the `namespace`, `property`, `value`, `oldValue`.
          * 
-         * @event pvc-globals-change
+         * @event pvc-globals-update
          */
 
       });
