@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <title>seed-element</title>
+
+  <script src="../../platform/platform.js"></script>
+  <link rel="import" href="tools/tools.html">
+  <script src="tools/htmltest.js"></script>
+  
+  <!-- Step 1: import the element to test -->
+  <link rel="import" href="../pvc-globals.html">
+
+</head>
+<body>
+
+  <pvc-globals id="a"></pvc-globals>
+  <pvc-globals id="b"></pvc-globals>
+  <pvc-globals namespace="config" id="c"></pvc-globals>
+  <script>
+
+    document.addEventListener('polymer-ready', function() {
+      var a = document.getElementById('a');
+      var b = document.getElementById('b');
+      var b = document.getElementById('c');
+      
+      a.globals.first = 'woo';
+      // another globals element should instantly get the same config
+      assert.equal(b.globals.first, 'woo');
+      // another namespace should not have the same config
+      assert.equal(c.globals.first, undefined);
+      done();
+    });
+
+  </script>
+
+</body>
+</html>
+

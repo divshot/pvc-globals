@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <title>pvc-globals Demo</title>
+
+  <script src="../platform/platform.js"></script>
+  <link rel="import" href="pvc-globals.html">
+
+</head>
+<body unresolved>
+  <polymer-element name="show-global" noscript attributes="namespace key">
+    <template>
+      <pvc-globals namespace="{{namespace}}" values="{{globals}}"></pvc-globals>
+      <div>The {{key}} key in the {{namespace}} namespace is {{globals[key]}}</div>
+    </template>
+  </polymer-element>
+  
+  <pvc-globals id="default"></pvc-globals>
+  <pvc-globals namespace="foo" id="foo"></pvc-globals>
+  
+  <show-global namespace="foo" key="bar"></show-global>
+  <show-global key="foo"></show-global>
+  
+  <script>
+    var tick = function(val) {
+      var def = document.getElementById('default')
+      requestAnimationFrame(function() {
+        if (val) {
+          def.values.foo = val;
+        } else {
+          delete def.values.foo;
+        }
+      });
+    }
+    
+    document.addEventListener('polymer-ready', function() {
+      tick('bar');
+      tick('baz');
+      tick(undefined);
+    });
+    
+    document.addEventListener('pvc-globals-update', function(e) {
+      console.log(e.detail);
+    });
+  </script>
+</body>
+</html>
