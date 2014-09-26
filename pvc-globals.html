@@ -108,7 +108,7 @@ them using the standard Polymer observe:
       
       Polymer('pvc-globals', {
         publish: {
-          values: null
+          values: undefined
         },
         observe: {
           namespace: 'resetData'
@@ -145,7 +145,7 @@ them using the standard Polymer observe:
         },
         
         set values(data) {
-          throw "Globals objects are immutable. You can only work on subkeys.";
+          throw "[pvc-globals] ERROR: Globals objects are immutable. You can only work on subkeys.";
         },
         
         resetData: function() {
