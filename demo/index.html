@@ -1,0 +1,34 @@
+<!DOCTYPE html><html><head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <title>pvc-globals Demo</title>
+
+  <script src="../../webcomponentsjs/webcomponents.js"></script>
+  <link rel="import" href="../pvc-globals.html">
+  <link rel="import" href="elements/show-global.html">
+  <link rel="import" href="elements/event-log.html">
+  <style>
+    body { font-family: RobotoDraft, sans-serif; }
+  </style>
+</head>
+<body unresolved>
+  <!-- <template id="demo" is="dom-bind"> -->
+    <pvc-globals id="default"></pvc-globals>
+    <pvc-globals namespace="foo" id="foo" on-globals-ready="ready()"></pvc-globals>
+
+    <show-global namespace="foo" key="bar"></show-global>
+    <show-global key="foo"></show-global>
+
+    <event-log></event-log>
+  <!-- </template> -->
+  <script>
+  var demo = document.querySelector('#demo');
+  var foo = document.querySelector('#foo');
+  foo.values.bar = 'test'
+
+    document.addEventListener('pvc-globals-update', function(e) {
+     console.log(e.detail);
+    });
+  </script>
+
+
+</body></html>

@@ -1,0 +1,31 @@
+<dom-module id="event-log">
+  <template>
+      <ul>
+        <template is="dom-repeat" items="{{events}}" as="event">
+          <li><b><span>{{_computeExpression1(event)}}</span>:</b> <i>{{event.event}}</i> event — <span>{{event.property}}</span> changed from "<span>{{event.oldValue}}</span>" to "<span>{{event.value}}</span>"</li>
+        </template>
+      </ul>
+    </template>
+  <script>
+    Polymer({
+      is: 'event-log',
+      properties: {
+        events: {
+          type: Array,
+          value: function () {
+            return [];
+          },
+          notify: true
+        }
+      },
+
+      polymerPush: function(detail) {
+        this.push('events', detail)
+      },
+
+      _computeExpression1: function (event) {
+        return event.namespace || 'default';
+      }
+    });
+  </script>
+</dom-module>

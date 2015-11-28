@@ -1,6 +1,6 @@
 {
   "name": "pvc-globals",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "authors": [
     "Michael Bleigh <mbleigh@mbleigh.com>"
   ],
@@ -13,13 +13,12 @@
     "**/.*"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#^0.5.0"
+    "polymer": "Polymer/polymer#^1.2.0",
+    "observe-js": "polymer/observe-js#~0.5.7"
   },
   "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#~1.1.1",
     "chai": "~1.9.1",
     "mocha": "~1.19.0"
-  },
-  "resolutions": {
-    "polymer": "^0.5.0"
   }
 }
