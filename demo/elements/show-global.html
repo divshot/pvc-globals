@@ -1,0 +1,31 @@
+<link rel="import" href="../../../polymer/polymer.html">
+<link rel="import" href="../../pvc-globals.html">
+
+<dom-module id="show-global">
+  <template>
+    <pvc-globals namespace="{{namespace}}" values="{{globals}}" on-pvc-globals-update="handleUpdate"></pvc-globals>
+    <div>The <span>{{key}}</span> key in the <span>{{namespace}}</span><span> namespace is </span><span>[[val]]</span></div>
+  </template>
+  <script>
+    Polymer({
+      is: 'show-global',
+      properties: {
+        key: { notify: true },
+        namespace: { notify: true },
+        val: String
+      },
+
+      observers: [
+        '_setVal(globals, key)'
+      ],
+
+      handleUpdate: function (e, detail) {
+        this._setVal(this.globals, this.key);
+        Polymer.dom(document).querySelector('event-log').polymerPush(detail);
+      },
+      _setVal: function (globals, key) {
+        this.val = globals[key];
+      }
+    });
+  </script>
+</dom-module>

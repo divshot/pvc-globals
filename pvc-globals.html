@@ -1,4 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
+<script src="../observe-js/src/observe.js"></script>
 
 <!--
 Document-wide globals with instant cross-element propagation.
@@ -39,154 +40,154 @@ them using the standard Polymer observe:
     </polymer-element>
 
 @element pvc-globals
+@demo demo/index.html
 @blurb Document-wide globals with instant cross-element propagation.
 @status alpha
 @homepage http://code.divshot.com/pvc-globals
 -->
-<polymer-element name="pvc-globals" attributes="namespace">
+<dom-module id="pvc-globals">
   <script>
-    (function() {
-      var _globals = {};
-      var _observers = {};
-      var _instances = [];
-      
-      var _fire = function(name, detail) {
-        _instances.forEach(function(instance) {
-          if (instance.namespace === detail.namespace) {
-            instance.fire(name, detail);
-          }
-        });
-      }
-                               
-      var _observeFn = function(namespace, added, removed, changed, getOldValueFn) {
-        if (namespace === '__default'){ namespace = null; }
-        Object.keys(added).forEach(function(prop) {
-          var detail =  {
-            event: 'add',
-            namespace: namespace, 
-            property: prop, 
-            value: added[prop], 
-            oldValue: getOldValueFn(prop)
-          }
-          _fire('pvc-globals-update', detail);
-          _fire('pvc-globals-add', detail);
-        });
-          
-        Object.keys(removed).forEach(function(prop) {
-          var detail =  {
-            event: 'remove',
-            namespace: namespace, 
-            property: prop, 
-            value: undefined,
-            oldValue: getOldValueFn(prop)
-          }
-          _fire('pvc-globals-update', detail);
-          _fire('pvc-globals-remove', detail);
-        });
-          
-        Object.keys(changed).forEach(function(prop) {
-          var detail =  {
-            event: 'change',
-            namespace: namespace, 
-            property: prop, 
-            value: changed[prop], 
-            oldValue: getOldValueFn(prop)
-          }
-          _fire('pvc-globals-update', detail);
-          _fire('pvc-globals-change', detail);
-        });
-      }
-      
-      var _makeAndObserve = function(namespace) {
-        _globals[namespace] || (_globals[namespace] = {});
-        _observers[namespace] = new ObjectObserver(_globals[namespace]);
-        _observers[namespace].open(function(a,r,c,o) {
-          _observeFn(namespace,a,r,c,o);
-        });
-        return _globals[namespace];
-      };
-      
-      Polymer('pvc-globals', {
-        publish: {
-          values: undefined
-        },
-        observe: {
-          namespace: 'resetData'
-        },
-        
-        /**
-         * The (optional) `namespace` attribute lets you have multiple
-         * scopes of globals.
-         * 
-         * @attribute namespace
-         * @type string
-         */
-        namespace: undefined,
+    (function () {
+      Polymer({
+        is: 'pvc-globals',
+        properties: {
+          /**
+           * The (optional) `namespace` attribute lets you have multiple
+           * scopes of globals.
+           *
+           * @attribute namespace
+           * @type string
+           */
+          namespace: {
+            type: String,
+            notify: true
+          },
 
-        /**
-         * The `values` attribute is an object containing the set globals for
-         * the current namespace. You can bind to this.
-         * 
-         * @attribute values
-         * @type object
-         */
-        created: function() {
-          _instances.push(this);
-          this.resetData();
+          /**
+           * The `values` attribute is an object containing the set globals for
+           * the current namespace. You can bind to this.
+           */
+          values: {
+            type: Object,
+            notify: true
+          },
+
+          _instances: {
+            type: Array,
+            value: []
+          },
+
+          _globals: {
+            type: Object,
+            value: {}
+          },
+
+          _observers: {
+            type: Array,
+            value: []
+          }
         },
 
-        get _ns() {
-          return this.namespace || '__default';
+        observers: [
+          '_initObserver(values.*)'
+        ],
+
+        attached: function() {
+          this.push('_instances', this);
         },
-        
-        get values() {
-          this.resetData();
-          return _globals[this._ns];
-        },
-        
-        set values(data) {
-          throw "[pvc-globals] ERROR: Globals objects are immutable. You can only work on subkeys.";
-        },
-        
-        resetData: function() {
-          if (!_globals[this._ns]) {
-            _makeAndObserve(this._ns);
+
+        _initObserver: function(change) {
+          if (!this._globals[this.namespace || '__default'] && change.path === 'values') {
+            this._makeAndObserve(this.namespace || '__default', this.values);
           }
+        },
+
+        _makeAndObserve: function(namespace, values) {
+          this._globals[namespace] || (this._globals[namespace] = values || {});
+          this._observers[namespace] = new ObjectObserver(this._globals[namespace]);
+          this._observers[namespace].open(function (a, r, c, o) {
+            this._observeFn(namespace, a, r, c, o);
+          }.bind(this));
+          return this._globals[namespace];
+        },
+
+        _observeFn: function(namespace, added, removed, changed, getOldValueFn) {
+          if (namespace === '__default') {
+            namespace = undefined;
+          }
+          console.log(added);
+          Object.keys(added).forEach(function (prop) {
+            var detail = {
+              event: 'add',
+              namespace: namespace,
+              property: prop,
+              value: added[prop],
+              oldValue: getOldValueFn(prop)
+            };
+            this._fire('pvc-globals-update', detail);
+            this._fire('pvc-globals-add', detail);
+          }.bind(this));
+          Object.keys(removed).forEach(function (prop) {
+            var detail = {
+              event: 'remove',
+              namespace: namespace,
+              property: prop,
+              value: undefined,
+              oldValue: getOldValueFn(prop)
+            };
+            this._fire('pvc-globals-update', detail);
+            this._fire('pvc-globals-remove', detail);
+          }.bind(this));
+          Object.keys(changed).forEach(function (prop) {
+            var detail = {
+              event: 'change',
+              namespace: namespace,
+              property: prop,
+              value: changed[prop],
+              oldValue: getOldValueFn(prop)
+            };
+            this._fire('pvc-globals-update', detail);
+            this._fire('pvc-globals-change', detail);
+          }.bind(this));
+        },
+
+        _fire: function(name, detail) {
+          this._instances.forEach(function (instance) {
+            if (instance.namespace === detail.namespace) {
+              instance.setAttribute('values', this.values);
+              instance.fire(name, detail);
+            }
+          }.bind(this));
         }
-
         /**
-         * The `pvc-globals-change` event is fired on each element whenever a
-         * global variable is added. The detail is an object including the 
-         * `namespace`, `property`, `value`, and `oldValue`.
-         * 
-         * @event pvc-globals-add
-         */
-         
-        /**
-         * The `pvc-globals-change` event is fired on each element whenever a
-         * global variable is removed. The detail is an object including the 
-         * `namespace`, `property`, `value`, and `oldValue`.
-         * 
-         * @event pvc-globals-remove
-         */
-        
-        /**
-         * The `pvc-globals-change` event is fired on each element whenever a
-         * global variable is modified. The detail is an object including the 
-         * `namespace`, `property`, `value`, `oldValue`.
-         * 
-         * @event pvc-globals-change
-         */
-        
-        /**
-         * The `pvc-globals-update` event is fired on each element whenever any
-         * kind of alteration (add, remove, change) is made. The detail is an
-         * object including the `namespace`, `property`, `value`, `oldValue`.
-         * 
-         * @event pvc-globals-update
-         */
-
+          * The `pvc-globals-change` event is fired on each element whenever a
+          * global variable is added. The detail is an object including the
+          * `namespace`, `property`, `value`, and `oldValue`.
+          *
+          * @event pvc-globals-add
+          */
+         /**
+          * The `pvc-globals-change` event is fired on each element whenever a
+          * global variable is removed. The detail is an object including the
+          * `namespace`, `property`, `value`, and `oldValue`.
+          *
+          * @event pvc-globals-remove
+          */
+         /**
+          * The `pvc-globals-change` event is fired on each element whenever a
+          * global variable is modified. The detail is an object including the
+          * `namespace`, `property`, `value`, `oldValue`.
+          *
+          * @event pvc-globals-change
+          */
+         /**
+          * The `pvc-globals-update` event is fired on each element whenever any
+          * kind of alteration (add, remove, change) is made. The detail is an
+          * object including the `namespace`, `property`, `value`, `oldValue`.
+          *
+          * @event pvc-globals-update
+          */
       });
-    })();
+    }());
   </script>
-</polymer-element>
+</dom-module>
